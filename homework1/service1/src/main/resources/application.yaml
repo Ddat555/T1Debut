@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: weather-producer-service
+weather:
+  schedule:
+    interval: ${interval_time:10000}
+server:
+  port: ${server_port:8081}

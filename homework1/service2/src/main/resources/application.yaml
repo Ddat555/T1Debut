@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: weather-consumer-service
+server:
+  port: ${server_port:8082}
