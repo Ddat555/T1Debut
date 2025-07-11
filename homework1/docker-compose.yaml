@@ -13,6 +13,7 @@ services:
     networks:
       - kafka-network
 
+
   service2:
     build:
       context: ./service2

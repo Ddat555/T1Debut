@@ -4,5 +4,6 @@ spring:
 weather:
   schedule:
     interval: ${interval_time:10000}
+    maxDays: ${max_day:7}
 server:
   port: ${server_port:8081}

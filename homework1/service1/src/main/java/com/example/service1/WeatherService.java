@@ -2,6 +2,7 @@ package com.example.service1;
 
 import com.example.service1.models.WeatherModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +16,23 @@ public class WeatherService {
     @Autowired
     private KafkaProducer kafkaProducer;
 
+    @Value("${weather.schedule.maxDays}")
+    private int maxDays;
+
+    private LocalDate currentDay;
+
+    public WeatherService(){
+        currentDay = LocalDate.now();
+
+    }
+
     private final Random rnd = new Random();
     private final List<String> citiesList = List.of("Moscow","Samara", "Ufa", "Kazan", "Tver");
     private final List<String> weatherStatus = List.of("Sun", "Rain", "Cloudy");
 
-    @Scheduled(fixedRateString = "${weather.schedule.interval}") //TODO : Добавить время из application.yaml
+    @Scheduled(fixedRateString = "${weather.schedule.interval}")
     public void generateWeather(){
-        for(LocalDate localDate = LocalDate.now(); localDate.isBefore(LocalDate.now().plusDays(7)); localDate = localDate.plusDays(1)){
+        for(LocalDate localDate = currentDay; localDate.isBefore(currentDay.plusDays(maxDays)); localDate = localDate.plusDays(1)){
             for(String city: citiesList){
                 WeatherModel weatherModel = new WeatherModel();
                 weatherModel.setCity(city);
@@ -33,6 +44,7 @@ public class WeatherService {
                 kafkaProducer.sendMessage(weatherModel, "weather");
             }
         }
+        currentDay = currentDay.plusDays(maxDays);
         WeatherModel weatherModel = new WeatherModel();
         weatherModel.setLast(true);
         kafkaProducer.sendMessage(weatherModel, "weather");
