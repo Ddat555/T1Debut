@@ -1,7 +1,6 @@
 package com.example.service2.models;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class StatisticModel {
@@ -11,12 +10,12 @@ public class StatisticModel {
     private int minTemp;
     private String cityWithMinTemp;
 
-    public void setMaxTemp(int temp, String city){
+    public void setMaxTemp(int temp, String city) {
         maxTemp = temp;
         cityWithMaxTemp = city;
     }
 
-    public void setMinTemp(int temp, String city){
+    public void setMinTemp(int temp, String city) {
         minTemp = temp;
         cityWithMinTemp = city;
     }

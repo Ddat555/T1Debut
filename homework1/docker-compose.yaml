@@ -46,7 +46,7 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - BITNAMI_DEBUG=yes
       - KAFKA_CFG_LOG_LEVEL=DEBUG
-      - KAFKA_KRAFT_CLUSTER_ID=_SNIuIJGTKO4RVsd_-rMiw # Замени на сгенерированный UUID
+      - KAFKA_KRAFT_CLUSTER_ID=_SNIuIJGTKO4RVsd_-rMiw
     volumes:
       - kafka_data:/bitnami/kafka
     restart: unless-stopped
