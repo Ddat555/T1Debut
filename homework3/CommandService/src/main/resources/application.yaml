@@ -1,0 +1,9 @@
+server:
+  port: ${server_port:8081}
+spring:
+  application:
+    name: command-service
+log:
+  console: ${log_console:false}
+command:
+  maxThread: ${max_thread:10}
