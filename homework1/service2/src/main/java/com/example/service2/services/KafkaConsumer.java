@@ -15,6 +15,8 @@ public class KafkaConsumer {
     @KafkaListener(topics = "weather", groupId = "1")
     private void listen(ConsumerRecord<String, WeatherModel> record) {
         WeatherModel weatherModel = record.value();
+        System.out.println("V: " + record.value());
+        System.out.println("O: " + weatherModel);
         if (weatherModel.isLast())
             statisticService.printStatistic();
         else

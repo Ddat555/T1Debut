@@ -1,25 +1,33 @@
 package com.example.CommandService.services;
 
 import com.example.CommandService.models.MetricModel;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
-@Service
 public class MetricService {
 
-    @Autowired
-    private KafkaTemplate<String, MetricModel> kafkaTemplate;
+    private final KafkaTemplate<String, MetricModel> kafkaTemplate;
 
-    public void sendMetric(String name, double value){
-        MetricModel model = new MetricModel(name,value);
-        kafkaTemplate.sendDefault(model);
+
+    public MetricService(KafkaTemplate<String, MetricModel> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendMetric(String name, double value, Map<String, String> tags){
-        MetricModel model = new MetricModel(name, value, tags);
-        kafkaTemplate.sendDefault(model);
+    public void sendMetric(String name, double value) {
+        try {
+            MetricModel model = new MetricModel(name, value);
+            kafkaTemplate.sendDefault(model);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void sendMetric(MetricModel model) {
+        try {
+            kafkaTemplate.sendDefault(model);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

@@ -1,6 +1,6 @@
 package com.example.MetricService.configurations;
 
-import com.example.MetricService.models.MetricModel;
+import com.example.MetricService.models.dto.MetricModel;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
@@ -14,16 +14,17 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 public class KafkaConfig {
 
     @Bean
-    public ConsumerFactory<String, MetricModel> consumerFactory(KafkaProperties kafkaProperties){
-        var map = kafkaProperties.buildConsumerProperties();
-        return new DefaultKafkaConsumerFactory<>(map, new StringDeserializer(), new JsonDeserializer<>(MetricModel.class));
+    public ConsumerFactory<String, MetricModel> consumerFactory(KafkaProperties kafkaProperties) {
+        var props = kafkaProperties.buildConsumerProperties();
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(MetricModel.class));
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, MetricModel> concurrentKafkaListenerContainerFactory(ConsumerFactory<String, MetricModel> consumerFactory){
-        ConcurrentKafkaListenerContainerFactory<String, MetricModel> concurrentKafkaListenerContainerFactory =
+    public ConcurrentKafkaListenerContainerFactory<String, MetricModel> kafkaListenerContainerFactory(
+            ConsumerFactory<String, MetricModel> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, MetricModel> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
-        concurrentKafkaListenerContainerFactory.setConsumerFactory(consumerFactory);
-        return concurrentKafkaListenerContainerFactory;
+        factory.setConsumerFactory(consumerFactory);
+        return factory;
     }
 }

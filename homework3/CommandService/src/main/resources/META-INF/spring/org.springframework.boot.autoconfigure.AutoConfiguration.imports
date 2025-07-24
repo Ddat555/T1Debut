@@ -1,0 +1,3 @@
+com.example.CommandService.configurations.ApplicationBeanConfig
+com.example.CommandService.configurations.KafkaConfig
+com.example.CommandService.configurations.PersonConfig

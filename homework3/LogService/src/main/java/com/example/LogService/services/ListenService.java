@@ -13,8 +13,8 @@ public class ListenService {
     private static final Logger log = LoggerFactory.getLogger(ListenService.class);
 
     @KafkaListener(topics = "log", groupId = "ddat111")
-    public void listen(ConsumerRecord<String, LogModel> consumerRecord){
-//        log.debug(consumerRecord.value().toString());
-        System.out.println("SOPL: " + consumerRecord.value());
+    public void listen(ConsumerRecord<String, LogModel> consumerRecord) {
+        LogModel logModel = consumerRecord.value();
+        System.out.println(logModel);
     }
 }

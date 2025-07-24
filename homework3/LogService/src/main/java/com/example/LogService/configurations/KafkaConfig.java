@@ -14,16 +14,25 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 public class KafkaConfig {
 
     @Bean
-    public ConsumerFactory<String, LogModel> consumerFactory(KafkaProperties kafkaProperties){
+    public ConsumerFactory<String, LogModel> consumerFactory(KafkaProperties kafkaProperties) {
         var map = kafkaProperties.buildConsumerProperties();
         return new DefaultKafkaConsumerFactory<>(map, new StringDeserializer(), new JsonDeserializer<>(LogModel.class));
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, LogModel> concurrentKafkaListenerContainerFactory(ConsumerFactory<String, LogModel> consumerFactory){
+    public ConcurrentKafkaListenerContainerFactory<String, LogModel> concurrentKafkaListenerContainerFactory(ConsumerFactory<String, LogModel> consumerFactory) {
         ConcurrentKafkaListenerContainerFactory<String, LogModel> concurrentKafkaListenerContainerFactory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         concurrentKafkaListenerContainerFactory.setConsumerFactory(consumerFactory);
         return concurrentKafkaListenerContainerFactory;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, LogModel> kafkaListenerContainerFactory(
+            ConsumerFactory<String, LogModel> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, LogModel> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory);
+        return factory;
     }
 }

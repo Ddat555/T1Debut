@@ -1,32 +1,29 @@
-package com.example.CommandService.services;
+package com.example.CommandService.annotations;
 
-import com.example.CommandService.annotations.WeylandWatchingYou;
+import com.example.CommandService.configurations.PersonConfig;
 import com.example.CommandService.models.CommandModel;
 import com.example.CommandService.models.LogModel;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-@Component
 @Aspect
-public class WeylandAspectProcessor {
+public class WaylandAspectProcessor {
 
-    @Autowired(required = false)
-    private KafkaTemplate<String, LogModel> kafkaTemplate;
+    private final KafkaTemplate<String, LogModel> kafkaTemplate;
+    private final PersonConfig personConfig;
 
-    @Value("${log.console}")
-    private boolean isConsoleEnabled;
+    public WaylandAspectProcessor(KafkaTemplate<String, LogModel> kafkaTemplate, PersonConfig personConfig) {
+        this.kafkaTemplate = kafkaTemplate;
+        this.personConfig = personConfig;
+    }
+
 
     @Around("@annotation(com.example.CommandService.annotations.WeylandWatchingYou)")
-    public Object weylandWatchingYouMethod(ProceedingJoinPoint proceedingJoinPoint){
+    public Object weylandWatchingYouMethod(ProceedingJoinPoint proceedingJoinPoint) {
         LogModel logModel = new LogModel();
         logModel.setMethodName(proceedingJoinPoint.getSignature().getName());
         CommandModel commandModel = getCommandModel(proceedingJoinPoint.getArgs());
@@ -39,32 +36,28 @@ public class WeylandAspectProcessor {
         } catch (Throwable e) {
             logModel.setResult("FAILURE");
             throw new RuntimeException(e);
-        }
-        finally {
+        } finally {
             sendAudit(logModel);
         }
     }
 
-    private CommandModel getCommandModel(Object[] args){
-        for(Object object : args){
-            if(object instanceof CommandModel)
+    private CommandModel getCommandModel(Object[] args) {
+        for (Object object : args) {
+            if (object instanceof CommandModel)
                 return (CommandModel) object;
         }
         return null;
     }
 
-    private void sendAudit(LogModel logModel){
-        if(isConsoleEnabled){
+    private void sendAudit(LogModel logModel) {
+        if (personConfig.getUserConfigMap().get("LOG_CONSOLE_ENABLED").equals("TRUE")) {
             System.out.println(logModel);
-        }
-        else{
+        } else {
             try {
                 kafkaTemplate.sendDefault(logModel);
-            }
-            catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 throw new NullPointerException();
             }
         }
-
     }
 }

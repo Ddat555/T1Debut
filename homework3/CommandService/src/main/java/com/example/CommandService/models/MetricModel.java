@@ -6,8 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,24 +15,23 @@ import java.util.Map;
 public class MetricModel {
     private String name;
     private double value;
-    private Map<String, String> tags = new HashMap<>();
+    private List<TagModel> tagModels;
     private LocalDateTime localDateTime;
 
-
-    public MetricModel(){
-        localDateTime = LocalDateTime.now();
-    }
-
-    public MetricModel(String name, double value){this.name = name; this.value = value; localDateTime = LocalDateTime.now();}
-
-    public MetricModel(String name, double value, Map<String, String> tags) {
+    public MetricModel(String name, double value) {
         this.name = name;
         this.value = value;
-        this.tags = tags;
         localDateTime = LocalDateTime.now();
     }
 
-    public void addTag(String key, String value){
-        tags.put(key,value);
+
+    @Override
+    public String toString() {
+        return "MetricModel{" +
+                "name='" + name + '\'' +
+                ", value=" + value +
+                ", tagModels=" + tagModels +
+                ", localDateTime=" + localDateTime +
+                '}';
     }
 }
