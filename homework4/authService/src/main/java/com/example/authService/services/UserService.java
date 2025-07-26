@@ -14,6 +14,7 @@ import com.example.authService.repositories.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,6 +47,9 @@ public class UserService {
     @Autowired
     private EntityManager entityManager;
 
+    @Value("${security.token.duration}")
+    private int duration;
+
     @Transactional
     public UUID loginUser(UserLoginDTO userLoginDTO){
         var userOpt = userRepository.findByLogin(userLoginDTO.getLogin());
@@ -60,7 +64,7 @@ public class UserService {
         });
         AuthToken authToken = new AuthToken();
         authToken.setCreatedAt(Instant.now());
-        authToken.setExpiresAt(Instant.now().plus(15, ChronoUnit.SECONDS));
+        authToken.setExpiresAt(Instant.now().plus(duration, ChronoUnit.SECONDS));
         authToken.setUserEntity(userOpt.get());
         authToken = authTokenRepository.save(authToken);
         return authToken.getToken();

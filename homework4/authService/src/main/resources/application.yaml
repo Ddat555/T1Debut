@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/homework4
+    url: jdbc:postgresql://${DATABASE_URL:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:homework4}
     username: server
     password: server
     driver-class-name: org.postgresql.Driver
@@ -9,3 +9,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
+security:
+  token:
+    duration: ${DURATION_TOKEN:3600}

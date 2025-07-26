@@ -27,17 +27,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, OpaqueTokenFilter opaqueTokenFilter) throws Exception {
         http
-                .securityMatcher("/**")
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(publicUrl.toArray(new String[0])).permitAll()
                         .requestMatchers(adminUrl.toArray(new String[0])).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .csrf(csrf -> csrf.disable()) // Отключаем CSRF для API
-                .addFilterBefore(opaqueTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Без сессий
+                .formLogin(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(opaqueTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

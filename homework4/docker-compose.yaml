@@ -1,0 +1,29 @@
+name: homework4
+services:
+  auth-service:
+    build:
+      context: ./authService
+    environment:
+      - DURATION_TOKEN=3600
+      - DATABASE_URL=auth_db
+      - DATABASE_PORT=5432
+    depends_on:
+      - auth_db
+    ports:
+      - "8080:8080"
+
+  auth_db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=homework4
+      - POSTGRES_USER=server
+      - POSTGRES_PASSWORD=server
+    volumes:
+      - postgres_data_user:/var/lib/postgresql/data_user
+    restart: unless-stopped
+
+
+volumes:
+  postgres_data_user:

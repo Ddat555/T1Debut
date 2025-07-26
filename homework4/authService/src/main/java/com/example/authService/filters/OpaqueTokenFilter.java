@@ -1,19 +1,14 @@
 package com.example.authService.filters;
 
 import com.example.authService.configurations.SecurityConfig;
-import com.example.authService.enums.UserRole;
-import com.example.authService.exceptions.ErrorResponse;
 import com.example.authService.exceptions.TokenInvalidException;
 import com.example.authService.exceptions.TokenIsExpiredException;
 import com.example.authService.repositories.AuthTokenRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,7 +18,6 @@ import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -44,23 +38,17 @@ public class OpaqueTokenFilter extends OncePerRequestFilter {
         }
         var authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            response.sendError(403, "Need Auth");
-            return;
-//            throw new AccessDeniedException("Need Auth");
+            throw new AccessDeniedException("Need Auth");
         }
         var tokenOpt = authTokenRepository.findById(UUID.fromString(authorizationHeader.substring(7)));
         if(tokenOpt.isEmpty()){
-            response.sendError(401, "Token is invalid");
-//            throw new TokenInvalidException("Token is invalid");
-
-            return;
+            throw new TokenInvalidException("Token is invalid");
         }
 
 
         if(tokenOpt.get().getExpiresAt().isBefore(Instant.now())){
             authTokenRepository.deleteById(tokenOpt.get().getToken());
-            response.sendError(401, "Token is expired");
-            return;
+            throw new TokenIsExpiredException("Token is expired");
         }
 
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
@@ -72,19 +60,4 @@ public class OpaqueTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void sendErrorResponse(HttpServletResponse response,
-                                   HttpStatus status,
-                                   String error,
-                                   String message) throws IOException {
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(status.value());
-
-        ErrorResponse errorResponse = new ErrorResponse(
-                status.value(),
-                error,
-                message
-        );
-
-        response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
-    }
 }
